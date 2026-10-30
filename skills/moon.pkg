@@ -1,0 +1,16 @@
+import {
+  "moonbitlang/async/fs",
+  "moonbitlang/async/http",
+  "moonbitlang/async/io",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/json",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/x/encoding/percent",
+  "moonbitlang/x/crypto",
+  "hustcer/fzip",
+  "moonbit-community/yaml",
+  "mizchi/semver",
+  "tonyfettes/url",
+}
+
+supported_targets = "native+wasm"

@@ -1,0 +1,86 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbit-community/skills/skills"
+
+import {
+  "mizchi/semver",
+  "moonbitlang/core/json",
+}
+
+// Values
+pub const MaxArchiveSize : Int32 = 20971520
+
+pub const MaxExpandedSize : Int32 = 52428800
+
+pub fn parse_version(String) -> @semver.SemVer raise InvalidSkill
+
+pub fn valid_name(String) -> Bool
+
+pub fn validate(Bytes) -> Archive raise InvalidSkill
+
+pub fn validate_path(String) -> Unit raise InvalidSkill
+
+// Errors
+pub suberror ClientError {
+  ClientError(String)
+}
+
+pub suberror InvalidSkill {
+  InvalidSkill(String)
+}
+
+// Types and methods
+pub struct Archive {
+  name : String
+  description : String
+  contents : Array[(String, FixedArray[Byte])]
+}
+pub async fn Archive::extract(Self, String) -> Unit
+
+type Client
+pub fn Client::Client(registry? : String, moon_home? : String) -> Self raise ClientError
+pub async fn Client::credentials(Self) -> Credentials?
+pub async fn Client::download(Self, String, output? : String, extract? : String) -> Download
+pub async fn Client::get(Self, String) -> SkillDetail
+pub async fn Client::list(Self) -> Array[Skill]
+pub async fn Client::publish(Self, String, String) -> Publication
+
+pub struct Credentials {
+  token : String
+  username : String?
+}
+
+pub struct Download {
+  skill : Skill
+  path : String
+}
+
+pub struct Publication {
+  owner : String
+  name : String
+  version : String
+  detail_url : String
+  archive_url : String
+  archive_sha256 : String
+} derive(@json.FromJson)
+
+pub struct Skill {
+  owner : String
+  name : String
+  version : String
+  author_avatar : String
+  description : String
+  detail_url : String
+  archive_url : String
+  archive_sha256 : String
+  created_at : String
+} derive(ToJson, @json.FromJson)
+
+pub struct SkillDetail {
+  skill : Skill
+  readme : String
+  versions : Array[String]
+}
+
+// Type aliases
+
+// Traits

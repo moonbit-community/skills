@@ -1,0 +1,14 @@
+import {
+  "moonbit-community/skills/skills" @client,
+  "moonbitlang/async",
+  "moonbitlang/core/argparse",
+  "moonbitlang/core/env",
+}
+
+supported_targets = "native+wasm"
+
+pkgtype(kind: "executable")
+
+options(
+  bin_name: "skills",
+)
