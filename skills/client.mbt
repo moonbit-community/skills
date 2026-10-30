@@ -10,13 +10,8 @@ pub fn Client::Client(
   moon_home? : String,
 ) -> Client raise ClientError {
   let origin = registry.trim_end(chars="/").to_owned()
-  if !origin.has_prefix("https://") &&
-    !origin.has_prefix("http://127.0.0.1:") &&
-    !origin.has_prefix("http://localhost:") &&
-    origin != "http://mooncakes.test" {
-    raise ClientError(
-      "Use an HTTPS registry (HTTP is supported for local development)",
-    )
+  if !origin.has_prefix("https://") && !origin.has_prefix("http://") {
+    raise ClientError("Use an HTTP or HTTPS registry")
   }
   { origin, moon_home, }
 }
