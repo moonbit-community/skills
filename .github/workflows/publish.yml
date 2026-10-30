@@ -1,101 +1,78 @@
 name: publish-package
-run-name: publish skills ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+run-name: publish skills
 
 on:
-  push:
-    tags:
-      - "v*"
   workflow_dispatch:
-    inputs:
-      tag:
-        description: "Existing release tag, for example v0.1.0"
-        required: true
-        type: string
 
-permissions:
-  contents: write
+permissions: {}
 
 concurrency:
-  group: publish-skills-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+  group: publish-skills
   cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       MOON_WORK: "off"
-      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+    outputs:
+      published_tag: ${{ steps.prepublish.outputs.published_tag }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.RELEASE_TAG }}
-
-      - name: Resolve release version
-        id: release
-        run: |
-          case "$RELEASE_TAG" in
-            v*) version="${RELEASE_TAG#v}" ;;
-            *)
-              echo "Release tag must use the v* format, got: $RELEASE_TAG" >&2
-              exit 1
-              ;;
-          esac
-          manifest_version="$(awk -F'"' '/^version = / { print $2; exit }' moon.mod)"
-          if [ "$version" != "$manifest_version" ]; then
-            echo "Tag version $version does not match moon.mod version $manifest_version" >&2
-            exit 1
-          fi
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+          persist-credentials: false
 
       - name: Install MoonBit
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
 
-      - name: MoonBit version
+      - name: Update dependencies
         run: |
           moon version --all
-          moonrun --version
+          moon update
 
-      - name: Update dependencies
-        run: moon update
-
-      - name: Check package
+      - name: Prepublish check
+        id: prepublish
         run: |
-          moon check --target wasm
-          moon check --target native
-
-      - name: Check generated interfaces
-        run: |
-          moon info --target wasm
+          moon fmt
           git diff --exit-code
-
-      - name: Check formatting
-        run: moon fmt --check
-
-      - name: Build CLI
-        run: |
-          moon build --target wasm --release
-          moon build --target native --release
+          moon check
+          moon test
+          version="$(sed -n 's/^version = "\(.*\)"/\1/p' moon.mod)"
+          if [[ -z "$version" ]]; then
+            echo "could not read package version from moon.mod" >&2
+            exit 1
+          fi
+          echo "published_tag=v${version}" >> "$GITHUB_OUTPUT"
 
       - name: Publish to Mooncakes
         env:
           SECRET: ${{ secrets.MOONCAKES_MOONBIT_COMMUNITY_TOKEN }}
+        shell: bash
         run: |
           if [ -z "$SECRET" ]; then
             echo "MOONCAKES_MOONBIT_COMMUNITY_TOKEN is required" >&2
             exit 1
           fi
-          mkdir -p "$HOME/.moon"
           printf '%s' "$SECRET" > "$HOME/.moon/credentials.json"
           trap 'rm -f "$HOME/.moon/credentials.json"' EXIT
           moon publish
 
-      - name: Create GitHub Release
+  tag:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Tag published commit
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+          PUBLISHED_TAG: ${{ needs.publish.outputs.published_tag }}
+        shell: bash
         run: |
-          gh release create "$RELEASE_TAG" \
-            --title "skills $RELEASE_VERSION" \
-            --generate-notes
+          gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f ref="refs/tags/$PUBLISHED_TAG" \
+            -f sha="$GITHUB_SHA"

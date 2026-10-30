@@ -47,6 +47,6 @@ moon build --target native --release
 
 Set the repository or organization secret `MOONCAKES_MOONBIT_COMMUNITY_TOKEN`
 to the Mooncakes `credentials.json` contents for the publishing account.
-Push a `v<VERSION>` tag matching `moon.mod`, or run the `publish-package`
-workflow with an existing tag. The workflow publishes to Mooncakes and creates
-a GitHub Release.
+Update the version in `moon.mod`, then run the `publish-package` workflow.
+It reads the version from `moon.mod`, publishes to Mooncakes, and tags the
+published commit as `v<VERSION>`.
