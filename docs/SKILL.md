@@ -1,9 +1,9 @@
 ---
-name: mooncakes-skills
+name: meta-skill
 description: "Find, download, use, create, and publish Agent Skills on mooncakes.io. Use when the user mentions mooncakes.io/skills, mooncakesio skills, or managing skill bundles through moonbit-community/skills. Excludes installing and publishing ordinary MoonBit library dependencies."
 ---
 
-# mooncakes.io Skills
+# Mooncakes Meta Skill
 
 Manage complete skill directories containing `SKILL.md` and supporting resources. Browse the marketplace at [mooncakes.io/skills](https://mooncakes.io/skills).
 
