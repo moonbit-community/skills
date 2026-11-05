@@ -5,6 +5,7 @@ pub struct Credentials {
 }
 
 ///|
+#derive(FromJson(fields(archive_sha256(rename="archive_digest"))))
 pub struct Publication {
   owner : String
   name : String
@@ -12,9 +13,10 @@ pub struct Publication {
   detail_url : String
   archive_url : String
   archive_sha256 : String
-} derive(FromJson(fields(archive_sha256(rename="archive_digest"))))
+}
 
 ///|
+#derive(FromJson(fields(archive_sha256(rename="archive_digest"))), ToJson(fields(archive_sha256(rename="archive_digest"))))
 pub struct Skill {
   owner : String
   name : String
@@ -25,10 +27,7 @@ pub struct Skill {
   archive_url : String
   archive_sha256 : String
   created_at : String
-} derive (
-  FromJson(fields(archive_sha256(rename="archive_digest"))),
-  ToJson(fields(archive_sha256(rename="archive_digest"))),
-)
+}
 
 ///|
 pub struct SkillDetail {
@@ -42,3 +41,12 @@ pub struct Download {
   skill : Skill
   path : String
 }
+
+///|
+pub extend Publication with FromJson::{from_json}
+
+///|
+pub extend Skill with FromJson::{from_json}
+
+///|
+pub extend Skill with ToJson::{to_json}

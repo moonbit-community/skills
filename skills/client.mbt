@@ -114,12 +114,12 @@ async fn read_bounded(reader : &@io.Reader, limit : Int32) -> Bytes {
 async fn request_bytes(
   url : String,
   limit : Int32,
-  method~ : @http.RequestMethod = Get,
+  request_method~ : @http.RequestMethod = Get,
   body~ : Bytes = b"",
   headers~ : @http.Headers = {},
 ) -> Bytes {
   let mut url = @url.Url::parse(url)
-  let mut method = method
+  let mut request_method = request_method
   let mut body = body
   for redirects in 0..<6 {
     if url.scheme != "https" && url.scheme != "http" {
@@ -128,7 +128,7 @@ async fn request_bytes(
     let client = @http.Client(url.origin())
     defer client.close()
     client.request(
-      method,
+      request_method,
       "\{url.pathname()}\{url.search()}",
       extra_headers=headers,
     )
@@ -146,8 +146,8 @@ async fn request_bytes(
         headers.remove("Authorization")
       }
       if response.code == 303 ||
-        (response.code is (301 | 302) && method == Post) {
-        method = Get
+        (response.code is (301 | 302) && request_method == Post) {
+        request_method = Get
         body = b""
         headers.remove("Content-Type")
       }
@@ -179,7 +179,7 @@ pub async fn Client::publish(
   let result = request_bytes(
     "\{self.origin}/api/v0/skills?version=\{encode(version)}",
     1024 * 1024,
-    method=Post,
+    request_method=Post,
     body=data,
     headers={
       "Authorization": "Bearer \{token}",
