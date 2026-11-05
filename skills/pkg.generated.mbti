@@ -54,6 +54,7 @@ pub struct Download {
   path : String
 }
 
+#derive(@json.FromJson)
 pub struct Publication {
   owner : String
   name : String
@@ -61,8 +62,10 @@ pub struct Publication {
   detail_url : String
   archive_url : String
   archive_sha256 : String
-} derive(@json.FromJson)
+}
+pub fn Publication::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 
+#derive(@json.FromJson, @json.ToJson)
 pub struct Skill {
   owner : String
   name : String
@@ -73,7 +76,9 @@ pub struct Skill {
   archive_url : String
   archive_sha256 : String
   created_at : String
-} derive(ToJson, @json.FromJson)
+}
+pub fn Skill::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Skill::to_json(Self) -> @json.Json
 
 pub struct SkillDetail {
   skill : Skill
