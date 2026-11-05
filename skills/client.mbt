@@ -189,7 +189,7 @@ pub async fn Client::publish(
   let publication : Publication = @json.from_json(
     @json.parse(@fzip.str_from_u8(result.to_fixedarray())),
   )
-  if publication.archive_sha256 !=
+  if publication.archive_digest !=
     @crypto.bytes_to_hex_string(@crypto.sha256(data)) {
     raise ClientError("Published archive checksum does not match the upload")
   }
@@ -236,7 +236,7 @@ pub async fn Client::download(
   }
   let skill = self.get(reference).skill
   let data = request_bytes(skill.archive_url, MaxArchiveSize)
-  if @crypto.bytes_to_hex_string(@crypto.sha256(data)) != skill.archive_sha256 {
+  if @crypto.bytes_to_hex_string(@crypto.sha256(data)) != skill.archive_digest {
     raise ClientError("Archive SHA-256 mismatch; nothing was written")
   }
   let archive = validate(data)
