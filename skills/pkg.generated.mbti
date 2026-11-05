@@ -61,7 +61,7 @@ pub struct Publication {
   version : String
   detail_url : String
   archive_url : String
-  archive_sha256 : String
+  archive_digest : String
 }
 pub fn Publication::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 
@@ -74,7 +74,7 @@ pub struct Skill {
   description : String
   detail_url : String
   archive_url : String
-  archive_sha256 : String
+  archive_digest : String
   created_at : String
 }
 pub fn Skill::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError

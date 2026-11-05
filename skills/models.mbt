@@ -5,18 +5,18 @@ pub struct Credentials {
 }
 
 ///|
-#derive(FromJson(fields(archive_sha256(rename="archive_digest"))))
+#derive(FromJson)
 pub struct Publication {
   owner : String
   name : String
   version : String
   detail_url : String
   archive_url : String
-  archive_sha256 : String
+  archive_digest : String
 }
 
 ///|
-#derive(FromJson(fields(archive_sha256(rename="archive_digest"))), ToJson(fields(archive_sha256(rename="archive_digest"))))
+#derive(FromJson, ToJson)
 pub struct Skill {
   owner : String
   name : String
@@ -25,7 +25,7 @@ pub struct Skill {
   description : String
   detail_url : String
   archive_url : String
-  archive_sha256 : String
+  archive_digest : String
   created_at : String
 }
 
