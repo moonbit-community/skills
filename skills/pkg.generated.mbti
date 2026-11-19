@@ -63,7 +63,7 @@ pub struct Publication {
   archive_url : String
   archive_digest : String
 }
-pub fn Publication::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Publication::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 
 #derive(@json.FromJson, @json.ToJson)
 pub struct Skill {
@@ -77,7 +77,7 @@ pub struct Skill {
   archive_digest : String
   created_at : String
 }
-pub fn Skill::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Skill::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Skill::to_json(Self) -> @json.Json
 
 pub struct SkillDetail {
