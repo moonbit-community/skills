@@ -6,6 +6,9 @@ on:
 
 permissions: {}
 
+env:
+  MOON_SEPARATE_COMPILATION: "1"
+
 concurrency:
   group: publish-skills
   cancel-in-progress: false
